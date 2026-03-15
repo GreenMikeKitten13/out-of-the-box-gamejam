@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://chjfsgevr2og5"]
+
+[node name="Main game" type="Node3D" unique_id=1695411839]
+
+[node name="Server" type="Node" parent="." unique_id=1666521029]
