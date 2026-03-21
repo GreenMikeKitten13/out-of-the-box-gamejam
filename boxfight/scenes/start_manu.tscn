@@ -1,8 +1,6 @@
 [gd_scene format=3 uid="uid://c1q3njr7pq16"]
 
-[ext_resource type="Script" uid="uid://8bwy0nixkf3b" path="res://scripts/build_client.gd" id="1_0gcgp"]
-
-[node name="Start manu" type="Control" unique_id=833862594]
+[node name="start_menu" type="Control" unique_id=833862594]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,5 +8,60 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Server" type="Node" parent="." unique_id=1355328126]
-script = ExtResource("1_0gcgp")
+[node name="Lobbyname" type="TextEdit" parent="." unique_id=1478104508]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.4
+anchor_right = 0.7
+anchor_bottom = 0.45
+grow_horizontal = 2
+grow_vertical = 2
+placeholder_text = "Lobby name"
+
+[node name="Newlobby" type="Button" parent="." unique_id=272689573]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -71.5
+offset_top = -15.5
+offset_right = 71.5
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Create new lobby"
+
+[node name="Start game" type="Button" parent="." unique_id=684477917]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.56700003
+anchor_right = 0.50100005
+anchor_bottom = 0.56700003
+offset_left = -70.0
+offset_top = -15.416016
+offset_right = 71.84796
+offset_bottom = 15.583984
+grow_horizontal = 2
+grow_vertical = 2
+text = "Start game
+"
+
+[node name="Lobbylist" type="VBoxContainer" parent="." unique_id=1547856571]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.3
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="lobbylist_refresh_timer" type="Timer" parent="Lobbylist" unique_id=1504409709]
+wait_time = 5.0
+autostart = true

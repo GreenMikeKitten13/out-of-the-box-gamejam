@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://xp045ovbqpjw"]
+
+[ext_resource type="Script" uid="uid://dyfywa4whytvk" path="res://scripts/player_script.gd" id="1_dnjla"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_q7yvd"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_s3esy"]
+
+[node name="CharacterBody3D" type="CharacterBody3D" unique_id=983284410]
+script = ExtResource("1_dnjla")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1918563476]
+shape = SubResource("CapsuleShape3D_q7yvd")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=841640119]
+mesh = SubResource("CapsuleMesh_s3esy")
+
+[node name="camera pivot" type="Node3D" parent="." unique_id=1486086057]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Camera3D" type="Camera3D" parent="camera pivot" unique_id=1255888589]
+
+[node name="Pos_send_timer" type="Timer" parent="." unique_id=1050518698]
+wait_time = 0.5
+autostart = true
+
+[connection signal="timeout" from="Pos_send_timer" to="." method="_on_pos_send_timer_timeout"]
