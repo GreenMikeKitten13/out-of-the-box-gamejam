@@ -8,17 +8,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Lobbyname" type="TextEdit" parent="." unique_id=1478104508]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.3
-anchor_top = 0.4
-anchor_right = 0.7
-anchor_bottom = 0.45
-grow_horizontal = 2
-grow_vertical = 2
-placeholder_text = "Lobby name"
-
 [node name="Newlobby" type="Button" parent="." unique_id=272689573]
 unique_name_in_owner = true
 layout_mode = 1

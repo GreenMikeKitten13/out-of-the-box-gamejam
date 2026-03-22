@@ -1,10 +1,10 @@
 extends CharacterBody3D
 
-class_name position_state
+#class_name position_state
 
-var X
-var Y
-var Z
+#var X
+#var Y
+#var Z
 
 const position_code = 1
 
@@ -26,10 +26,18 @@ var gravity_strength = 2
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	air_time = 0
+	set_physics_process(false)  # ADD THIS
+	set_process(false)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	build_client.socket.received_match_state.connect(received_info)
+	if build_client.session.user_id == self.name:
+		camera_pivot.get_node("Camera3D").current = true
+	else:
+		camera_pivot.get_node("Camera3D").current = false
 
 func _input(event: InputEvent) -> void:
+	if build_client.session.user_id != self.name:
+		return
 	if event is InputEventMouseMotion:
 		mouse_change = event.relative
 	if event.is_action_pressed("ui_cancel"):
@@ -37,12 +45,16 @@ func _input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	if build_client.session.user_id != self.name:
+		return
 	camera_pivot.rotate(Vector3.LEFT, mouse_change.y * mouse_sensetivity)
 	camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, -PI/2, PI/2)
 	self.rotate(Vector3.DOWN, mouse_change.x * mouse_sensetivity)
 	mouse_change = Vector2.ZERO
 
 func _physics_process(delta: float) -> void:
+	if build_client.session.user_id != self.name:
+		return
 	var motion = Vector3.ZERO
 	
 	if Input.get_action_strength("forward"):
@@ -76,23 +88,14 @@ func _physics_process(delta: float) -> void:
 	self.velocity = motion
 	self.move_and_slide()
 
-
 func _on_pos_send_timer_timeout() -> void:
+	if build_client.session.user_id != self.name:
+		return
 	var state = {
-	X = position.x,
-	Y = position.y,
-	z = position.z
+		"X": position.x,
+		"Y": position.y,
+		"Z": position.z
 	}
 	while not build_client.globby_id:
 		await get_tree().process_frame
 	await build_client.socket.send_match_state_async(build_client.globby_id, position_code, JSON.stringify(state))
-
-func received_info(match_state : NakamaRTAPI.MatchData):
-	match match_state.op_code:
-		position_code:
-			var position_status = JSON.parse_string(match_state.data)
-			var user = match_state.presence.session_id
-			if user in build_client.players:
-				build_client[user].position = Vector3(position_status.x, position_status.y, position_status.z)
-		_:
-			push_warning("Unsupported op code on player_script.gd")
