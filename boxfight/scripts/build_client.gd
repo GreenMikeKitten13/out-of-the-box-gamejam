@@ -48,6 +48,18 @@ func _ready() -> void:
 
 var match_connection
 
+
+func _process(delta: float) -> void:
+	for user_id in players.keys():
+		if user_id == session.user_id:
+			continue
+		var node = players[user_id]
+		if node == null or not node.has_meta("target_position"):
+			continue
+		var target = node.get_meta("target_position")
+		node.position = node.position.lerp(target, delta * 10)
+
+
 func join_lobby(lobby_id):
 	match_connection = await socket.join_match_async(lobby_id)
 	socket.received_match_presence.connect(on_player_joined)
@@ -118,10 +130,11 @@ func on_data_recieved(data:NakamaRTAPI.MatchData):
 			var position_status = JSON.parse_string(data.data)
 			var user = data.presence.user_id
 			if user in players and players[user] != null and user != session.user_id:
-				players[user].position = players[user].position.lerp(
-					Vector3(position_status["X"], position_status["Y"], position_status["Z"]),
-					0.6
-				)
+				players[user].set_meta("target_position", Vector3(
+					position_status["X"],
+					position_status["Y"],
+					position_status["Z"]
+				))
 		update_players_code:
 			var parsed = JSON.parse_string(data.data)
 			players.clear()
