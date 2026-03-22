@@ -1,10 +1,5 @@
 extends CharacterBody3D
 
-#class_name position_state
-
-#var X
-#var Y
-#var Z
 
 const position_code = 1
 
@@ -23,11 +18,15 @@ var air_time = 0
 var gravity_strength = 2
 
 @onready var camera_pivot: Node3D = $"camera pivot"
+@onready var canvas_layer = get_node("../Virtual Joystick")
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	if DisplayServer.is_touchscreen_available():
+		canvas_layer.visible = true
+		
+	
 	air_time = 0
-	set_physics_process(false)  # ADD THIS
+	set_physics_process(false)
 	set_process(false)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if build_client.session.user_id == self.name:
@@ -35,11 +34,29 @@ func _ready() -> void:
 	else:
 		camera_pivot.get_node("Camera3D").current = false
 
+var look_touch_index : int = -1
+var last_touch_position : Vector2 = Vector2.ZERO
 func _input(event: InputEvent) -> void:
 	if build_client.session.user_id != self.name:
 		return
+	
 	if event is InputEventMouseMotion:
 		mouse_change = event.relative
+	
+	if event is InputEventScreenTouch:
+		var half_width = DisplayServer.window_get_size().x / 2.0
+		if event.position.x > half_width:  
+			if event.pressed:
+				look_touch_index = event.index
+				last_touch_position = event.position
+			elif event.index == look_touch_index:
+				look_touch_index = -1
+	
+	if event is InputEventScreenDrag:
+		if event.index == look_touch_index:
+			mouse_change = event.position - last_touch_position
+			last_touch_position = event.position
+	
 	if event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 

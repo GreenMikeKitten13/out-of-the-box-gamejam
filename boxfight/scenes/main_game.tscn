@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://chjfsgevr2og5"]
 
 [ext_resource type="Script" uid="uid://c4ot15ljljv42" path="res://scripts/game_script.gd" id="1_s3esy"]
+[ext_resource type="Material" uid="uid://bfqv5ffborv80" path="res://materials/box_amterial.tres" id="2_72e8q"]
+[ext_resource type="PackedScene" uid="uid://dmr0fcamx7t56" path="res://addons/virtual_joystick/virtual_joystick_scene.tscn" id="3_d2op2"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_q7yvd"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -16,6 +18,7 @@ tonemap_mode = 2
 glow_enabled = true
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_q7yvd"]
+material = ExtResource("2_72e8q")
 size = Vector2(10, 10)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_s3esy"]
@@ -31,11 +34,54 @@ environment = SubResource("Environment_72e8q")
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
 shadow_enabled = true
 
-[node name="floor" type="StaticBody3D" parent="." unique_id=1321294824]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+[node name="box" type="StaticBody3D" parent="." unique_id=1321294824]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="floor" unique_id=1898781953]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="box" unique_id=1898781953]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
 mesh = SubResource("PlaneMesh_q7yvd")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="floor" unique_id=902599253]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="box" unique_id=902599253]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
 shape = SubResource("BoxShape3D_s3esy")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="box" unique_id=1658561983]
+transform = Transform3D(-2.1855695e-07, -5, 0, 5, -2.1855695e-07, 0, 0, 0, 5, 25, 0, 0)
+mesh = SubResource("PlaneMesh_q7yvd")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="box" unique_id=2146619241]
+transform = Transform3D(-2.1855695e-07, -5, 0, 5, -2.1855695e-07, 0, 0, 0, 5, 25, 0, 0)
+shape = SubResource("BoxShape3D_s3esy")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="box" unique_id=1972270738]
+transform = Transform3D(2.1855695e-07, 5, -4.371139e-07, 5, -2.1855695e-07, 0, -1.9106854e-14, -4.371139e-07, -5, -25, 0, 0)
+mesh = SubResource("PlaneMesh_q7yvd")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="box" unique_id=1859159004]
+transform = Transform3D(2.1855695e-07, 5, -4.371139e-07, 5, -2.1855695e-07, 0, -1.9106854e-14, -4.371139e-07, -5, -25, 0, 0)
+shape = SubResource("BoxShape3D_s3esy")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="box" unique_id=1795380970]
+transform = Transform3D(9.553426e-15, 2.1855695e-07, 5, 5, -2.1855695e-07, 1.5529405e-21, 2.1855695e-07, 5, -2.1855695e-07, 0, 0, -25)
+mesh = SubResource("PlaneMesh_q7yvd")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="box" unique_id=1757578641]
+transform = Transform3D(9.553426e-15, 2.1855695e-07, 5, 5, -2.1855695e-07, 1.5529405e-21, 2.1855695e-07, 5, -2.1855695e-07, 0, 0, -25)
+shape = SubResource("BoxShape3D_s3esy")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="box" unique_id=1713678898]
+transform = Transform3D(9.553429e-15, 2.1855695e-07, -5, 5, -2.1855695e-07, 1.5529405e-21, -2.1855695e-07, -5, -2.1855695e-07, 0, 0, 25)
+mesh = SubResource("PlaneMesh_q7yvd")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="box" unique_id=1829066019]
+transform = Transform3D(9.553429e-15, 2.1855695e-07, -5, 5, -2.1855695e-07, 1.5529405e-21, -2.1855695e-07, -5, -2.1855695e-07, 0, 0, 25)
+shape = SubResource("BoxShape3D_s3esy")
+
+[node name="Virtual Joystick" parent="." unique_id=769641759 instance=ExtResource("3_d2op2")]
+visible = false
+offset_top = -648.0
+offset_bottom = -348.0
+scale = Vector2(2, 2)
+action_left = "left"
+action_right = "right"
+action_up = "forward"
+action_down = "backward"

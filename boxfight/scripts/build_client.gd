@@ -75,14 +75,11 @@ var server = false
 
 func _on_newlobby_pressed() -> void:
 	server = true
-	#var lobby_name = lobbyname.text
 	var lobby : NakamaRTAPI.Match = await socket.create_match_async()
 	var lobby_id = lobby.match_id
 	
 	start_game.visible = true
-	
-	#var write_object = NakamaWriteStorageObject.new("lobbies",lobby_id,2,1,JSON.stringify({"name":lobby_name, "match_id" : lobby_id}), "")
-	#await client.write_storage_objects_async(session, [write_object])
+
 	
 	var join_button:Button = Button.new()
 	join_button.text = lobby_id
@@ -94,7 +91,6 @@ func _on_newlobby_pressed() -> void:
 	socket.received_match_presence.connect(on_player_joined)
 	
 	players[lobby.self_user.user_id] = null
-	#players[session.user_id] = null
 
 func _on_lobbylist_refresh_timer_timeout() -> void:
 	var result = await client.list_matches_async(session, lobby_min_players, lobby_max_players, limit, authoritative, "", "")
@@ -103,26 +99,26 @@ func _on_lobbylist_refresh_timer_timeout() -> void:
 			var join_button:Button = Button.new()
 			lobbylist.add_child(join_button)
 			join_button.pressed.connect(join_lobby.bind(lobby.match_id))
-			#var storage = await  client.read_storage_objects_async(session, [NakamaStorageObjectId.new("lobbies", lobby.match_id, session.user_id)])
+			
 			var lobby_name = lobby.match_id
-			#if not storage.is_exception() and storage.objects.size() > 0:
-			#	var data = JSON.parse_string(storage.objects[0].value)
-			#	lobby_name = data.get("name", "Unknown")
+
 			join_button.text = lobby_name
 			listed_lobbies.append(lobby.match_id)
 
 var start_game_code = 10
 var update_players_code = 2
+var minigame_code = 3
 
 func _on_start_game_pressed() -> void:
 	await socket.send_match_state_async(globby_id, update_players_code, JSON.stringify(players))
 	await socket.send_match_state_async(globby_id, start_game_code, "")
 	load_main_game()
+	decide_minigame()
+	await socket.send_match_state_async(globby_id, minigame_code, JSON.stringify(current_minigame))
 
 var lerp_speed = 4
 
 func on_data_recieved(data:NakamaRTAPI.MatchData):
-	#print("catching")
 	match data.op_code:
 		start_game_code:
 			load_main_game()
@@ -140,6 +136,8 @@ func on_data_recieved(data:NakamaRTAPI.MatchData):
 			players.clear()
 			for key in parsed.keys():
 				players[key] = null
+		minigame_code:
+			current_minigame = JSON.parse_string(data.data)
 		_:
 			push_warning("Unsopported op code on build_client.gd")
 
@@ -165,16 +163,15 @@ func load_main_game():
 		get_tree().root.get_node("Main game").add_child(go)
 		go.position = Vector3(0, start_y_position,0)
 		start_y_position += 4
-		await get_tree().process_frame  # wait one frame so position is applied
+		await get_tree().process_frame 
 		go.set_physics_process(true)
 		go.set_process(true)
-		print("spawned: ", user_id, " at ", go.position)  # ADD THIS
+		print("spawned: ", user_id, " at ", go.position)  
 		var timer = go.get_node_or_null("Pos_send_timer")
 		if timer:
 			timer.stop()
 			await get_tree().process_frame
 			timer.start()
-
 
 func on_player_joined(presence:NakamaRTAPI.MatchPresenceEvent):
 	for p in presence.joins:
@@ -187,20 +184,21 @@ func on_player_joined(presence:NakamaRTAPI.MatchPresenceEvent):
 		elif p.user_id in players:
 			players.erase(p.user_id)
 
+var minigame_percentage = {"fps":0.33,"break":0.33, "build":0.33}
+var current_minigame = ""
 
-	#if server:
-		#print("server perspective:\n",match_connection.presences, " are currently online") #sees nobody
-	#else:
-		#print("clinet perspective:\n", match_connection.presences, " are currently online") #sees client (self)
+func decide_minigame():
+	var randnumb = randf()
+	if randnumb > minigame_percentage["fps"]:
+		if randnumb > minigame_percentage["fps"] + minigame_percentage["break"]:
+			current_minigame = "build"
+		else:
+			current_minigame = "break"
+	else:
+		current_minigame = "fps"
+	set_percentage(current_minigame, minigame_percentage)
 
-#func on_presence_received(presence:NakamaRTAPI.MatchPresenceEvent):
-	#print(presence.joins, " are currently in the server")
-	#for p in presence.joins:
-		#if p.user_id not in players:
-			#var go = PLAYER.instantiate()
-			#players[p.user_id] = go
-			#get_tree().root.get_node("Main game").add_child(go)
-	#for p in presence.leaves:
-		#if p.user_id in players:
-			#players[p.user_id].queue_free()
-			#players.erase(p.user_id)
+func set_percentage(winner, dictionary):
+	dictionary[winner] -= 1
+	for looser in dictionary.keys():
+		dictionary[looser] += 0.5
