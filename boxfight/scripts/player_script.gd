@@ -18,12 +18,15 @@ var air_time = 0
 var gravity_strength = 2
 
 @onready var camera_pivot: Node3D = $"camera pivot"
-@onready var canvas_layer = get_node("../Virtual Joystick")
+@onready var canvas_layer = get_node("../CanvasLayer")
 
 func _ready() -> void:
 	if DisplayServer.is_touchscreen_available():
 		canvas_layer.visible = true
-		
+		var jump_button = canvas_layer.get_node("Jump")
+		#jump_button.pressed.connect(mobile_jump_activate)
+		#jump_button.released.connect(mobile_jump_deactivate)
+		jump_button.position = DisplayServer.window_get_size() /1.5
 	
 	air_time = 0
 	set_physics_process(false)
@@ -36,30 +39,29 @@ func _ready() -> void:
 
 var look_touch_index : int = -1
 var last_touch_position : Vector2 = Vector2.ZERO
+
 func _input(event: InputEvent) -> void:
 	if build_client.session.user_id != self.name:
 		return
 	
-	if event is InputEventMouseMotion:
+	if event is InputEventMouseMotion and not DisplayServer.is_touchscreen_available():
 		mouse_change = event.relative
 	
-	if event is InputEventScreenTouch:
-		var half_width = DisplayServer.window_get_size().x / 2.0
-		if event.position.x > half_width:  
-			if event.pressed:
-				look_touch_index = event.index
-				last_touch_position = event.position
-			elif event.index == look_touch_index:
-				look_touch_index = -1
-	
-	if event is InputEventScreenDrag:
-		if event.index == look_touch_index:
+	if DisplayServer.is_touchscreen_available():
+		var half_width = DisplayServer.window_get_size().x / 4.0
+		if event is InputEventScreenTouch:
+			if event.position.x > half_width:
+				if event.pressed:
+					look_touch_index = event.index
+					last_touch_position = event.position
+				elif event.index == look_touch_index:
+					look_touch_index = -1
+		elif event is InputEventScreenDrag and event.index == look_touch_index:
 			mouse_change = event.position - last_touch_position
 			last_touch_position = event.position
-	
+
 	if event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
 
 func _process(_delta: float) -> void:
 	if build_client.session.user_id != self.name:
@@ -86,6 +88,7 @@ func _physics_process(delta: float) -> void:
 		jumping = true
 		jump_timer = 0.25
 		can_jump = false
+		air_time = 0
 	
 	if jumping and jump_timer > 0:
 		jump_timer -=  delta
@@ -116,3 +119,8 @@ func _on_pos_send_timer_timeout() -> void:
 	while not build_client.globby_id:
 		await get_tree().process_frame
 	await build_client.socket.send_match_state_async(build_client.globby_id, position_code, JSON.stringify(state))
+#
+#func mobile_jump_activate():
+	#Input.action_press("jump")
+#func mobile_jump_deactivate():
+	#Input.action_release("jump")

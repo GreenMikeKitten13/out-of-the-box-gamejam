@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://c4ot15ljljv42" path="res://scripts/game_script.gd" id="1_s3esy"]
 [ext_resource type="Material" uid="uid://bfqv5ffborv80" path="res://materials/box_amterial.tres" id="2_72e8q"]
 [ext_resource type="PackedScene" uid="uid://dmr0fcamx7t56" path="res://addons/virtual_joystick/virtual_joystick_scene.tscn" id="3_d2op2"]
+[ext_resource type="Texture2D" uid="uid://bkvmydfn5saxg" path="res://addons/virtual_joystick/textures/joystick_tip.png" id="4_ipu61"]
+[ext_resource type="Texture2D" uid="uid://bm30au8mjfc2f" path="res://addons/virtual_joystick/textures/joystick_base_outline.png" id="5_ygxny"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_q7yvd"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -76,8 +78,10 @@ mesh = SubResource("PlaneMesh_q7yvd")
 transform = Transform3D(9.553429e-15, 2.1855695e-07, -5, 5, -2.1855695e-07, 1.5529405e-21, -2.1855695e-07, -5, -2.1855695e-07, 0, 0, 25)
 shape = SubResource("BoxShape3D_s3esy")
 
-[node name="Virtual Joystick" parent="." unique_id=769641759 instance=ExtResource("3_d2op2")]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=729694706]
 visible = false
+
+[node name="Virtual Joystick" parent="CanvasLayer" unique_id=769641759 instance=ExtResource("3_d2op2")]
 offset_top = -648.0
 offset_bottom = -348.0
 scale = Vector2(2, 2)
@@ -85,3 +89,9 @@ action_left = "left"
 action_right = "right"
 action_up = "forward"
 action_down = "backward"
+
+[node name="Jump" type="TouchScreenButton" parent="CanvasLayer" unique_id=1647585371]
+scale = Vector2(3, 3)
+texture_normal = ExtResource("4_ipu61")
+texture_pressed = ExtResource("5_ygxny")
+action = "jump"
